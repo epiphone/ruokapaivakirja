@@ -1,13 +1,14 @@
 # -*-coding:utf-8-*-
 """
-Reititysfunktiot käyttäjätoimintojen (CRUD) osalta.
+Reititysfunktiot käyttäjätoimintojen (rekisteröinti yms.) osalta.
 
 """
 
 from application import app
 from flask import request, g
 import database as db
-from utils import require_auth, json
+from utils import json
+from auth import require_auth
 
 
 @app.route("/register", methods=["POST"])

@@ -15,21 +15,13 @@ import database as db
 ### GLOBALS ###
 
 URL_ROOT = "http://www.fineli.fi"
-STATS = ["energia", "hh", "rasva", "proteiini", "alkoholi", "hapot",
-         "tärkkelys", "sokerit", "sakkaroosi", "laktoosi", "fruktoosi",
-         "sokerialkoholi", "kuitu, kokonais-", "kuitu liukenematon",
-         "polysakkaridi", "glukoosi", "maltoosi", "galaktoosi",
-         "rasva yht tag", "rasva yht", "rasva tyyd", "rasva cis",
-         "rasva monityyd", "rasva trans", "linolihappo", "alfalinoleenihappo",
-         "epa", "dha", "kolesteroli", "sterolit", "natrium", "suola", "kalium",
-         "magnesium", "kalsium", "fosfori", "rauta", "sinkki", "jodi",
-         "seleeni", "tryptofaani", "a", "d", "e", "k", "c", "hplc", "ne",
-         "niasiini", "b2", "b1", "b12", "vetykloridi", "karotenoidit"]
 
 
 def search_foods(query):
     """
     Palauttaa hakuehtoja vastaavat elintarvikkeet + id:t.
+
+    Paluuarvona lista, jossa arvot tyyppiä [id, nimi].
     """
     query = re.sub("\s+", " ", query).strip()
 
@@ -68,7 +60,7 @@ def get_food(fid):
     root = html.parse(url)
 
     # Elintarvikkeen id (Finelin käyttämä) ja nimi:
-    food = {"_id": fid}
+    food = {"_id": fid, "data": {}}
     fname = root.xpath("/html/body/div/table[2]//h1")[0].text.strip().lower()
     food["name"] = fname
 
@@ -93,14 +85,7 @@ def get_food(fid):
         if "(" in unit:
             unit = unit.split()[-1][1:-1]
 
-        food[name] = (value, unit)
+        food["data"][name] = (value, unit)
 
     db.add_food(food)
     return food
-
-
-def test(query="a"):
-    fids = [fid for (fid, food) in search_foods(query)]
-    for fid in fids:
-        food = get_food(fid)
-        print len(food), fid

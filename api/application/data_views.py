@@ -5,8 +5,10 @@ Reititysfunktiot datatoimintojen osalta.
 """
 
 from application import app
+from utils import json
+from auth import require_auth
+import fineli_scraper as scraper
 from flask import request, g
-from utils import require_auth, json
 import database as db
 from datetime import datetime
 
@@ -18,11 +20,72 @@ PUT = "PUT"
 DELETE = "DELETE"
 
 
+@app.route("/api/json/foods/<fid>")
+# @require_auth
+def food(fid):
+    """
+    Palauttaa yksittäisen elintarvikkeen tiedot.
+    """
+    food = scraper.get_food(fid)
+    if not food:
+        return json("fail", {"fid": "food not found"})
+
+    return json(data=food)
+
+
+@app.route("/api/json/foods")
+# @require_auth
+def search_foods():
+    """
+    Palauttaa elintarvikehaun tulokset annetulla hakusanalla.
+
+    URL-parametrit:
+    - q: hakusana
+    """
+    query = request.args.get("q")
+    if not query:
+        return json("fail", {"q": "invalid query"})
+
+    results = scraper.search_foods(query)
+    return json(data=results)
+
+
+@app.route("/api/json/user/favs")
+@require_auth
+def get_favs():
+    """
+    Palauttaa kirjautuneen käyttäjän suosikkielintarvikkeet.
+    """
+    favs = db.get_favs_by_user(g.user["_id"])
+    return json(data=favs)
+
+
+@app.route("/api/json/user/favs/<fid>")
+@require_auth
+def add_or_delete_bite(fid):
+    """
+    POST lisää kirjautuneelle käyttäjälle uuden suosikkielintarvikkeen.
+
+    DELETE poistaa suosikkielintarvikkeen.
+    """
+    if request.method == DELETE:
+        db.delete_fav_from_user(g.user["_id"], fid)
+        return json()
+
+    food = db.get_food(fid)
+    if not food:
+        return json("fail", {"fid": "food not found"})
+
+    fav = {"fid": food["_id"], "name": food["name"]}
+    db.add_fav_to_user(g.user["_id"], fav)
+    return json()
+
+
 @app.route("/api/json/user/bites", methods=[GET, POST])
 @require_auth
 def bites():
     """
-    GET Palauttaa kirjautuneen käyttäjän annokset annetulta aikaväliltä.
+    GET palauttaa kirjautuneen käyttäjän annokset annetulta aikaväliltä.
 
     URL-parametrit:
     - start: inklusiivinen alkupäivämäärä (YYYYmmdd)
