@@ -60,11 +60,19 @@ def get_food(fid):
     """
     Palauttaa id:tä vastaavan elintarvikkeen ravintotiedot.
     """
-    url = URL_ROOT + "/food.php?foodid=" + fid
+    stored = db.get_food(fid)
+    if stored:
+        return stored
 
+    url = URL_ROOT + "/food.php?foodid=" + fid
     root = html.parse(url)
 
-    food = {}
+    # Elintarvikkeen id (Finelin käyttämä) ja nimi:
+    food = {"_id": fid}
+    fname = root.xpath("/html/body/div/table[2]//h1")[0].text.strip().lower()
+    food["name"] = fname
+
+    # Ravintoarvot:
     rows = root.xpath(
         "/html/body/div/table[2]/tr/td[2]/table/tr[3]/td/table/tr")
     for row in rows:
@@ -87,6 +95,7 @@ def get_food(fid):
 
         food[name] = (value, unit)
 
+    db.add_food(food)
     return food
 
 

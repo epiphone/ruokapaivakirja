@@ -10,11 +10,6 @@ import database as db
 from utils import require_auth, json
 
 
-@app.route("/")
-def index():
-    return "Hello world!"
-
-
 @app.route("/register", methods=["POST"])
 def register():
     """
@@ -22,8 +17,21 @@ def register():
 
     TODO
     """
-    db.add_user(request.form["username"], request.form["key"])
-    return "user %s added" % request.form["username"]
+    username = request.form["username"]
+    key = request.form["key"]
+
+    # Validoidaan syötteet:
+    if not username:
+        return json("fail", {"username": "invalid username"})
+    if not key or 7 < len(key) < 500:
+        return json("fail", {"key": "invalid key"})
+
+    existing_user = db.get_user(username)
+    if existing_user:
+        return json("fail", {"username": "username taken"})
+
+    uid = db.add_user(username, key)
+    return json("success", {"id": str(uid)})
 
 
 @app.route("/user", methods=["GET", "POST"])

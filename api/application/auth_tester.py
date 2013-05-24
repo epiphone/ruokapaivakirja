@@ -62,8 +62,8 @@ def index():
         return """
         <html><head></head><body>
         <form action="/" method="POST">
-        url: <input type="text" name="url" value="http://130.234.180.42:5000">
-        data: <input type="text" name="data" value="a=10&b=neljä">
+        url: <input type="text" name="url" value="http://130.234.180.42:5000/api/json/" autofocus>
+        data: <input type="text" name="data">
         appname: <input type="text" name="appname" value="sovelluksen nimi">
         app key: <input type="text" name="app_key" value="sovelluksen avain">
         username: <input type="text" name="username" value="aleksi">
@@ -78,7 +78,10 @@ def index():
     url = request.form["url"]
     method = request.form["method"]
     data_items = request.form["data"].split("&")
-    data = {k: v for k, v in [x.split("=") for x in data_items]}
+    if data_items and data_items != [""]:
+        data = {k: v for k, v in [x.split("=") for x in data_items]}
+    else:
+        data = {}
     timestamp = str(time.time()).split(".")[0]
     params = {
         "username": request.form["username"],

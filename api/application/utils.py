@@ -7,15 +7,50 @@ Aleksi Pekkala
 
 import urllib
 from functools import wraps
-from flask import g, request, redirect, jsonify
+from flask import g, request, redirect
 import time
 import base64
 from hashlib import sha1
 import hmac
 from uuid import uuid4
 import urllib
-from application import TIMESTAMP_LIMIT, PASSWORD_SALT
+from datetime import datetime, date
 import database as db
+
+
+### GLOBAALIT ###
+
+TIMESTAMP_LIMIT = 5 * 60  # sekuntia
+PASSWORD_SALT = "djn12gsiugaieufe4f8fafh"
+
+
+# Jsonify-moduuli ei oletuksena osaa muokata MongoDB:n ObjectId-olioita
+# eikä datetime-olioita JSON-merkkijonoiksi, konffataan:
+# (lähde: Fabrice Aneche github.com/akhenakh)
+try:
+    import simplejson as json_module
+except ImportError:
+    import json as json_module
+from bson.objectid import ObjectId
+from pymongo.cursor import Cursor
+from werkzeug import Response
+
+
+class MongoJsonEncoder(json_module.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        elif isinstance(obj, ObjectId):
+            return unicode(obj)
+        return json_module.JSONEncoder.default(self, obj)
+
+
+def jsonify(*args, **kwargs):
+    """
+    Jsonify, joka tukee MongoDB:n ObjectId-olioita ja datetime-olioita.
+    """
+    return Response(json_module.dumps(dict(*args, **kwargs),
+                    cls=MongoJsonEncoder), mimetype="application/json")
 
 
 def json(status="success", data=None, message=None):
@@ -105,7 +140,7 @@ def require_auth(f):
 
         # Poimitaan pyynnön data:
         method = request.method
-        if method in ["GET", "POST"]:
+        if method in ["GET", "DELETE"]:
             data_src = request.args
         else:
             data_src = request.form
@@ -143,3 +178,11 @@ def require_auth(f):
         return f(*args, **kwargs)
 
     return decorator
+
+
+def objectify(oid):
+    """
+    Jos oid on merkkijono, muokataan se ObjectId-olioksi,
+    jos oid on ObjectId-olio, palautetaan se muokkaamattomana.
+    """
+    return oid if isinstance(oid, ObjectId) else ObjectId(oid)

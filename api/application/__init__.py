@@ -17,10 +17,8 @@ app.config.from_object("application.settings")
 ### GLOBAALIT ###
 
 API_URL = "http://130.234.180.42:5000"
-TIMESTAMP_LIMIT = 5 * 60  # sekuntia
-PASSWORD_SALT = "djn12gsiugaieufe4f8fafh"
 
 
 ### SIVUT (views) ###
 
-import application.user_views
+from application import user_views, data_views
