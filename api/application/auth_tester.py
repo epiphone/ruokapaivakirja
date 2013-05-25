@@ -12,8 +12,16 @@ from hashlib import sha1
 import hmac
 from uuid import uuid4
 import requests
+import sys
 
-API_URL = "http://130.234.180.42:5000"
+
+try:
+    API_URL = sys.argv[1]
+    if not API_URL.startswith("http://"):
+        API_URL = "http://" + API_URL
+except KeyError:
+    API_URL = "http://130.234.180.42:5000"
+
 PASSWORD_SALT = "djn12gsiugaieufe4f8fafh"
 app = Flask(__name__)
 

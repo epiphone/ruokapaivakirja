@@ -25,7 +25,8 @@ def add_user(username, key):
     """
     Lisää käyttäjän tietokantaan.
     """
-    return db.users.insert({"username": username, "key": key})
+    return db.users.insert({
+        "username": username, "key": key, "favs": [], "recipes": []})
 
 
 def get_user(username=None):
