@@ -30,7 +30,7 @@ def search_foods(query):
         return stored
 
     url = URL_ROOT + "/foodsearch.php?name=" + escape(query)
-
+    print "url=", url
     root = html.parse(url)
 
     foods = []

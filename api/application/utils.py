@@ -77,14 +77,15 @@ def escape_char(c):
     >>> escape_char("ä")
     '%E4'
     """
-    c = c.lower()
+    assert isinstance(c, unicode)  # TODO debug
+    c = c.lower().encode("utf-8")
     if c == "ä":
         return "%E4"
     elif c == "ö":
         return "%F6"
     elif c == "å":
         return "%E5"
-    return c
+    return urllib.quote_plus(c)
 
 
 def objectify(oid):
