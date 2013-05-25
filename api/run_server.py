@@ -8,8 +8,8 @@ from application import app
 import sys
 
 try:
-    port = int(sys.argv[1])
-except KeyError, ValueError:
+    port = int(sys.argv[-1])
+except IndexError, ValueError:
     port = 5000
 
-app.run(host="0.0.0.0", port=5000)
+app.run(host="0.0.0.0", port=port)
