@@ -6,13 +6,14 @@ author: Aleksi Pekkala (aleksipekkala@hotmail.com)
 """
 
 from flask import Flask
+from werkzeug.contrib.cache import SimpleCache
 
 
 ### SOVELLUKSEN ALUSTUS ###
 
 app = Flask("application")
 app.config.from_object("application.settings")
-
+cache = SimpleCache()
 
 ### GLOBAALIT ###
 

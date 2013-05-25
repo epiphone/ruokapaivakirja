@@ -4,7 +4,7 @@ Reititysfunktiot datatoimintojen osalta.
 
 """
 
-from application import app
+from application import app, cache
 from utils import json
 from auth import require_auth
 import fineli_scraper as scraper
@@ -13,12 +13,19 @@ import database as db
 from datetime import datetime
 
 
+BASIC_STATS = [
+    ("kcal", "energia, laskennallinen"),
+    ("carbs", u"hiilihydraatti imeytyvä"),
+    ("protein", "proteiini"),
+    ("fat", "rasva")]
 DATEFORMAT = "%Y%m%d"
 GET = "GET"
 POST = "POST"
 PUT = "PUT"
 DELETE = "DELETE"
 
+
+### FOODS ###
 
 @app.route("/api/json/foods/<fid>")
 # @require_auth
@@ -50,6 +57,8 @@ def search_foods():
     return json(data=results)
 
 
+### FAVS ###
+
 @app.route("/api/json/user/favs")
 @require_auth
 def get_favs():
@@ -60,9 +69,9 @@ def get_favs():
     return json(data=favs)
 
 
-@app.route("/api/json/user/favs/<fid>")
+@app.route("/api/json/user/favs/<fid>", methods=[POST, DELETE])
 @require_auth
-def add_or_delete_bite(fid):
+def add_or_delete_fav(fid):
     """
     POST lisää kirjautuneelle käyttäjälle uuden suosikkielintarvikkeen.
 
@@ -72,7 +81,7 @@ def add_or_delete_bite(fid):
         db.delete_fav_from_user(g.user["_id"], fid)
         return json()
 
-    food = db.get_food(fid)
+    food = scraper.get_food(fid)
     if not food:
         return json("fail", {"fid": "food not found"})
 
@@ -80,6 +89,41 @@ def add_or_delete_bite(fid):
     db.add_fav_to_user(g.user["_id"], fav)
     return json()
 
+
+### RECIPES ###
+
+@app.route("/api/json/user/recipes")
+@require_auth
+def get_recipes():
+    """
+    Palauttaa kirjautuneen käyttäjän suosikkireseptit.
+    """
+    recipes = db.get_recipes_by_user(g.user["_id"])
+    return json(data=recipes)
+
+
+@app.route("/api/json/user/recipes/<rid>", methods=[POST, DELETE])
+@require_auth
+def add_or_delete_recipe(rid):
+    """
+    POST lisää kirjautuneelle käyttäjälle uuden suosikkireseptin.
+
+    DELETE poistaa suosikkireseptin.
+    """
+    if request.method == DELETE:
+        db.delete_recipe_from_user(g.user["_id"], rid)
+        return json()
+
+    recipe = db.get_recipe(rid)
+    if not recipe:
+        return json("fail", {"rid": "recipe not found"})
+
+    recipe = {"rid": recipe["_id"], "name": recipe["name"]}
+    db.add_fav_to_user(g.user["_id"], fav)
+    return json()
+
+
+### BITES ###
 
 @app.route("/api/json/user/bites", methods=[GET, POST])
 @require_auth
@@ -95,9 +139,12 @@ def bites():
     POST lisää uuden annoksen.
 
     POST-parametrit:
-    - fid: elintarvikkeen id
+    - fid: elintarvikkeen id (ei pakollinen, jos rid on määritelty)
+    - rid: reseptin nimi (ei pakollinen, jos fid on määritelty)
     - amount: määrä grammoissa
     - date: päivämäärä (YYYYmmdd)
+
+    Huom! Jos sekä fid että rid ovat määritelty, käytetään fid:tä.
     """
     if request.method == GET:
         try:
@@ -110,6 +157,7 @@ def bites():
 
         return json(data=db.get_bites_by_user(g.user["_id"], start, end))
 
+    # POST - lisätään annos:
     try:
         amount = int(request.form["amount"])
         bite = {
@@ -118,20 +166,33 @@ def bites():
             "amount": amount,
             "date": datetime.strptime(request.form["date"], DATEFORMAT)
         }
+
+        if "fid" in request.form:
+            bite["fid"] = request.form["fid"]
+        else:
+            bite["rid"] = request.form["rid"]
+
     except KeyError:
         return json("fail", {"parameters": "missing parameters"})
     except ValueError:
         return json("fail", {"parameters": "invalid parameters"})
 
-    food = db.get_food(request.form["fid"])
-    if not food:
-        return json("fail", {"fid": "food not found"})
+    if "fid" in bite:
+        food = scraper.get_food(bite["fid"])
+        if not food:
+            return json("fail", {"fid": "food not found"})
 
-    bite["name"] = food["name"]
-    bite["kcal"] = round(food["energia, laskennallinen"][0]/100.0*amount)
-    bite["carbs"] = round(food[u"hiilihydraatti imeytyvä"][0]/100.0*amount)
-    bite["protein"] = round(food["proteiini"][0] / 100.0 * amount)
-    bite["fat"] = round(food["rasva"][0] / 100.0 * amount)
+        bite["name"] = food["name"]
+        for p1, p2 in BASIC_STATS:
+            bite[p1] = round(food[p2][0] / 100.0 * amount)
+    else:
+        recipe = db.get_recipe(bite["rid"])
+        if not recipe:
+            return json("fail", {"rid": "recipe not found"})
+
+        bite["name"] = recipe["name"]
+        for p1, p2 in BASIC_STATS:
+            bite[p1] = round(recipe[p1] / 100.0 * amount)
 
     db.add_bite(bite)
     return json()

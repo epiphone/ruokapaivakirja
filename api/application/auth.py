@@ -10,7 +10,7 @@ thebuzzmedia.com/designing-a-secure-rest-api-without-oauth-authentication/
 
 
 import database as db
-from utils import escape
+from utils import escape, json
 
 from functools import wraps
 from flask import g, request, redirect

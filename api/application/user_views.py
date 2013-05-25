@@ -24,7 +24,7 @@ def register():
     # Validoidaan syötteet:
     if not username:
         return json("fail", {"username": "invalid username"})
-    if not key or 7 < len(key) < 500:
+    if not key or not (7 < len(key) < 500):
         return json("fail", {"key": "invalid key"})
 
     existing_user = db.get_user(username)
