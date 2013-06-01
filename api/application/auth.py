@@ -87,7 +87,7 @@ def require_auth(f):
         # Luodaan allekirjoitus:
         signing_key = client["key"] + "&" + user["key"]
         hashed = hmac.new(signing_key.encode("utf-8"), base_string.encode("utf-8"), sha1)
-        signature = escape(base64.b64encode(hashed.digest()))
+        signature = escape(base64.b64encode(hashed.hexdigest()))
 
         # Tarkastetaan vastaako luotu allekirjoitus pyynnön allekirjoitusta:
         if signature != auth_dict["signature"]:

@@ -19,8 +19,8 @@ try:
     API_URL = sys.argv[1]
     if not API_URL.startswith("http://"):
         API_URL = "http://" + API_URL
-except KeyError:
-    API_URL = "http://130.234.180.42:5000"
+except IndexError:
+    API_URL = "http://toimiiks.cloudapp.net"
 
 PASSWORD_SALT = "djn12gsiugaieufe4f8fafh"
 app = Flask(__name__)
@@ -70,7 +70,7 @@ def index():
         return """
         <html><head></head><body>
         <form action="/" method="POST">
-        url: <input type="text" name="url" value="http://130.234.180.42:5000/api/json/" autofocus>
+        url: <input type="text" name="url" value="%s/api/json/" autofocus>
         data: <input type="text" name="data">
         appname: <input type="text" name="appname" value="sovelluksen nimi">
         app key: <input type="text" name="app_key" value="sovelluksen avain">
@@ -82,7 +82,7 @@ def index():
         <option value="DELETE">DELETE</option></select>
         <input type="submit" value="submit">
         </form></body></html>
-        """
+        """ % API_URL
     url = request.form["url"]
     method = request.form["method"]
     data_items = request.form["data"].split("&")
@@ -114,12 +114,12 @@ def index():
     hashed = hmac.new(signing_key.encode("utf-8"), base_string.encode("utf-8"), sha1)
 
     # Lisätään allekirjoitus Authorization-headerin parametreihin:
-    params["signature"] = base64.b64encode(hashed.digest())
+    params["signature"] = base64.b64encode(hashed.hexdigest())
 
     # Kääritään Authorization-headerin parametrit:
     auth_header = ",".join(['%s="%s"' %
                   (escape(k), escape(v)) for k, v in params.items()])
-
+    return "key=" + signing_key.encode("utf-8") + "<br>str=" + base_string.encode("utf-8") + "<br>hash=" + params["signature"]
     # Lähetetään pyyntö palvelimelle, palautetaan vastaus:
     headers = {"Authorization": auth_header}
     methods = {
