@@ -21,7 +21,7 @@ def after_request(response):
     """
     Kutsutaan jokaisen HTTP-pyynnön lopussa, juuri ennen vastausta.
     """
-    response.headers.add("Access-Control-Allow-Origin", request.headers["Origin"])
+    response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin"))
     response.headers.add("Access-Control-Allow-Headers", "Content-Type")
     return response
 
