@@ -20,6 +20,9 @@ cache = SimpleCache()
 def after_request(response):
     """
     Kutsutaan jokaisen HTTP-pyynnön lopussa, juuri ennen vastausta.
+
+    Laitetaan palvelin tukemaan CORSia, eli asiakas voi tehdä AJAX-pyyntöjä
+    domainin ulkopuolelta. TODO debug
     """
     response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin"))
     response.headers.add("Access-Control-Allow-Headers", "Content-Type")
