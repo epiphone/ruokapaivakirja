@@ -5,7 +5,7 @@ Ruokapäiväkirja API
 author: Aleksi Pekkala (aleksipekkala@hotmail.com)
 """
 
-from flask import Flask
+from flask import Flask, request
 from werkzeug.contrib.cache import SimpleCache
 
 
@@ -14,6 +14,17 @@ from werkzeug.contrib.cache import SimpleCache
 app = Flask("application")
 app.config.from_object("application.settings")
 cache = SimpleCache()
+
+
+@app.after_request
+def after_request(response):
+    """
+    Kutsutaan jokaisen HTTP-pyynnön lopussa, juuri ennen vastausta.
+    """
+    response.headers["Access-Control-Allow-Origin"] = request.headers["Origin"]
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
+
 
 ### GLOBAALIT ###
 
