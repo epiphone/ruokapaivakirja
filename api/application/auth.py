@@ -2,7 +2,9 @@
 """
 API:n autorisointi.
 
-TODO ohjeet asiakkaalle tai ohjaus toteutukseen?
+TODO
+- ohjeet asiakkaalle tai ohjaus toteutukseen?
+- loggaukset pois
 
 Autorisointimenetelmän lähde: Riyad Kalla
 thebuzzmedia.com/designing-a-secure-rest-api-without-oauth-authentication/
@@ -20,6 +22,7 @@ from hashlib import sha1
 import hmac
 from uuid import uuid4
 import urllib
+import logging
 
 
 ### GLOBAALIT ###
@@ -37,6 +40,7 @@ def require_auth(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         if not "Authorization" in request.headers:
+            logging.error("Authorization header missing")
             return json("fail", {"authorization": "authorization header is required"})
 
         # Poimitaan Authorization-headerin parametrit:
@@ -46,16 +50,19 @@ def require_auth(f):
 
         # Tarkastetaan timestamp:
         if time.time() - float(auth_dict["timestamp"]) > TIMESTAMP_LIMIT:
+            logging.error("Old timestamp")
             return json("fail", {"timestamp": "old timestamp"})
 
         # Etsitään käyttäjä tietokannasta:
         user = db.get_user(urllib.unquote(auth_dict["username"]))
         if not user:
+            logging.error("User not found")
             return json("fail", {"username": "user not found"})
 
         # Etsitään asiakassovellus tietokannasta:
         client = db.get_client(urllib.unquote(auth_dict["client"]))
         if not client:
+            logging.error("Client not found")
             return json("fail", {"client": "client not found"})
 
         # Poimitaan pyynnön data:
@@ -91,6 +98,7 @@ def require_auth(f):
 
         # Tarkastetaan vastaako luotu allekirjoitus pyynnön allekirjoitusta:
         if signature != auth_dict["signature"]:
+            logging.error("Incorrect signature, base_string=" + base_string)
             return json("fail", {"signature": "incorrect signature"})
 
         # Allekirjoitus oikein -> autorisointi onnistui:

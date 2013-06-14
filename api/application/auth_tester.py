@@ -119,7 +119,7 @@ def index():
     # Kääritään Authorization-headerin parametrit:
     auth_header = ",".join(['%s="%s"' %
                   (escape(k), escape(v)) for k, v in params.items()])
-    return "key=" + signing_key.encode("utf-8") + "<br>str=" + base_string.encode("utf-8") + "<br>hash=" + params["signature"]
+
     # Lähetetään pyyntö palvelimelle, palautetaan vastaus:
     headers = {"Authorization": auth_header}
     methods = {
@@ -133,7 +133,9 @@ def index():
         r = methods[method](url, params=data, headers=headers)
     else:
         r = methods[method](url, data=data, headers=headers)
-    return r.text, r.status_code
+
+    return "RESPONSE:<br>%s<br><br>BASE STRING:<br>%s<br><br>HEADERS:<br>%s" % (r.text, base_string, headers)
+    # return r.text, r.status_code
 
 
 if __name__ == "__main__":
