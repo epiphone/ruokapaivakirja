@@ -102,6 +102,7 @@ def require_auth(f):
             return json("fail", {"signature": "incorrect signature"})
 
         # Allekirjoitus oikein -> autorisointi onnistui:
+        logging.error("Auth success")
         g.user = user
         return f(*args, **kwargs)
 
