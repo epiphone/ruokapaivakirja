@@ -20,7 +20,7 @@ cache = SimpleCache()
 # TODO debug
 @app.before_request
 def before_request():
-    logging.info("BEFORE REQUEST: URL=%s\n IS_XHR=%s\n HEADERS=%s" % (request.url, str(request.is_xhr), str(request.headers)))
+    logging.error("BEFORE REQUEST: URL=%s\n IS_XHR=%s\n HEADERS=%s" % (request.url, str(request.is_xhr), str(request.headers)))
 
 
 @app.after_request

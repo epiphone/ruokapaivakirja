@@ -66,7 +66,7 @@ def get_favs():
     """
     Palauttaa kirjautuneen käyttäjän suosikkielintarvikkeet.
     """
-    logging.info("get_favs")
+    logging.error("get_favs")
     favs = db.get_favs_by_user(g.user["_id"])
     return json(data=favs)
 
