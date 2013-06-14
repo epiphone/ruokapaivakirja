@@ -11,6 +11,7 @@ import fineli_scraper as scraper
 from flask import request, g
 import database as db
 from datetime import datetime
+import logging
 
 
 BASIC_STATS = [
@@ -65,6 +66,7 @@ def get_favs():
     """
     Palauttaa kirjautuneen käyttäjän suosikkielintarvikkeet.
     """
+    logging.info("get_favs")
     favs = db.get_favs_by_user(g.user["_id"])
     return json(data=favs)
 

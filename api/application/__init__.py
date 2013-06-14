@@ -7,6 +7,7 @@ author: Aleksi Pekkala (aleksipekkala@hotmail.com)
 
 from flask import Flask, request
 from werkzeug.contrib.cache import SimpleCache
+import logging
 
 
 ### SOVELLUKSEN ALUSTUS ###
@@ -14,6 +15,12 @@ from werkzeug.contrib.cache import SimpleCache
 app = Flask("application")
 app.config.from_object("application.settings")
 cache = SimpleCache()
+
+
+# TODO debug
+@app.before_request
+def before_request():
+    logging.info("BEFORE REQUEST: URL=%s\n IS_XHR=%s\n HEADERS=%s" % (request.url, str(request.is_xhr), str(request.headers)))
 
 
 @app.after_request
