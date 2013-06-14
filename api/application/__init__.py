@@ -32,7 +32,7 @@ def after_request(response):
     domainin ulkopuolelta. TODO debug
     """
     response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin"))
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
     return response
 
 
