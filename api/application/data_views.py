@@ -186,7 +186,7 @@ def bites():
 
         bite["name"] = food["name"]
         for p1, p2 in BASIC_STATS:
-            bite[p1] = round(food[p2][0] / 100.0 * amount)
+            bite[p1] = round(food["data"][p2][0] / 100.0 * amount)
     else:
         recipe = db.get_recipe(bite["rid"])
         if not recipe:
