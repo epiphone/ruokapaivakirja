@@ -48,6 +48,8 @@ def require_auth(f):
         auth_params = [param.split("=") for param in auth_header.split(",")]
         auth_dict = {k: v[1:-1] for k, v in auth_params}
 
+        logging.error("AUTH_DICT=" + str(auth_dict))  # TODO debug
+
         # Tarkastetaan timestamp:
         if time.time() - float(auth_dict["timestamp"]) > TIMESTAMP_LIMIT:
             logging.error("Old timestamp")
