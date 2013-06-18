@@ -92,6 +92,7 @@ def require_auth(f):
             for key in sorted(signature_params)])
 
         base_string = "&".join([method, escape(root_url), escape(params_str)])
+        logging.error("BASE_STR=" + base_string)
 
         # Luodaan allekirjoitus:
         signing_key = client["key"] + "&" + user["key"]
