@@ -31,7 +31,7 @@ def after_request(response):
     Laitetaan palvelin tukemaan CORSia, eli asiakas voi tehdä AJAX-pyyntöjä
     domainin ulkopuolelta. TODO debug
     """
-    response.headers.add("Access-Control-Allow-Origin", request.headers.get("Origin"))
+    response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
     return response
 
