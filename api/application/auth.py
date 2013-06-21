@@ -39,6 +39,7 @@ def require_auth(f):
     """
     @wraps(f)
     def decorator(*args, **kwargs):
+        logging.error("\nNEW REQUEST:")
         if not "Authorization" in request.headers:
             logging.error("Authorization header missing")
             return json("fail", {"authorization": "authorization header is required"})
@@ -47,8 +48,6 @@ def require_auth(f):
         auth_header = request.headers["Authorization"]
         auth_params = [param.split("=") for param in auth_header.split(",")]
         auth_dict = {k: v[1:-1] for k, v in auth_params}
-
-        logging.error("AUTH_DICT=" + str(auth_dict))  # TODO debug
 
         # Tarkastetaan timestamp:
         if time.time() - float(auth_dict["timestamp"]) > TIMESTAMP_LIMIT:
@@ -74,6 +73,7 @@ def require_auth(f):
         else:
             data_src = request.form
         data = {escape(k): escape(v) for k, v in data_src.iteritems()}
+        logging.error("DATA=" + str(data))
 
         # Kerätään parametrit allekirjoitusta varten:
         params = {
@@ -92,6 +92,7 @@ def require_auth(f):
             for key in sorted(signature_params)])
 
         base_string = "&".join([method, escape(root_url), escape(params_str)])
+        logging.error("BASE_STR=" + base_string)
 
         # Luodaan allekirjoitus:
         signing_key = client["key"] + "&" + user["key"]
