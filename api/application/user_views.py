@@ -11,7 +11,7 @@ from utils import json
 from auth import require_auth
 
 
-@app.route("/register", methods=["POST"])
+@app.route("/api/json/user/register", methods=["POST"])
 def register():
     """
     Rekisteröi uuden käyttäjän.
