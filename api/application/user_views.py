@@ -35,19 +35,24 @@ def register():
     return json("success", {"id": str(uid)})
 
 
-@app.route("/user", methods=["GET", "POST"])
+@app.route("/api/json/user")
 @require_auth
 def user():
     """
     Palauttaa käyttäjän tiedot.
 
-    TODO
+    Paluuarvossa avaimina username, goals, favs, id.
     """
-    user = g.user
-    return json("success", {"username": user["username"], "key": user["key"]})
+    user = {
+        "username": g.user["username"],
+        "favs": g.user["favs"],
+        "id": g.user["_id"],
+        "goals": g.user["goals"] if "goals" in g.user else {}
+    }
+    return json("success", user)
 
 
-@app.route("/user/goals", methods=["GET", "POST"])
+@app.route("/api/json/user/goals", methods=["GET", "POST"])
 @require_auth
 def goals():
     """
