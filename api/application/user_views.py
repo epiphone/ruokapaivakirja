@@ -47,7 +47,7 @@ def user():
     return json("success", {"username": user["username"], "key": user["key"]})
 
 
-@app.route("user/goals", methods=["GET", "POST"])
+@app.route("/user/goals", methods=["GET", "POST"])
 @require_auth
 def goals():
     """
