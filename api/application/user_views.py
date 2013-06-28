@@ -73,9 +73,10 @@ def goals():
         return json("success", user["goals"])
 
     # POST
+    goals = {}
     try:
         for attr in ["kcal", "carbs", "fat", "protein"]:
-            request.form[attr] = int(request.form[attr])
+            goals[attr] = int(request.form[attr])
     except KeyError:
         return json("fail", {"missing parameter": attr})
     except ValueError:
