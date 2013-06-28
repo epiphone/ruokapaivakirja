@@ -70,7 +70,7 @@ def goals():
     if request.method == "GET":
         if not "goals" in user:
             return json("success", {})
-        return json("success", user.goals)
+        return json("success", user["goals"])
 
     # POST
     try:
@@ -84,4 +84,3 @@ def goals():
     if db.set_user_goals(user["_id"], goals):
         return json("success")
     return json("error", "database update error")
-
