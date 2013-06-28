@@ -4,7 +4,7 @@ Reititysfunktiot datatoimintojen osalta.
 
 """
 
-from application import app, cache
+from application import app
 from utils import json
 from auth import require_auth
 import fineli_scraper as scraper
@@ -121,7 +121,7 @@ def add_or_delete_recipe(rid):
         return json("fail", {"rid": "recipe not found"})
 
     recipe = {"rid": recipe["_id"], "name": recipe["name"]}
-    db.add_fav_to_user(g.user["_id"], fav)
+    db.add_fav_to_user(g.user["_id"], recipe)
     return json()
 
 

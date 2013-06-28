@@ -39,6 +39,20 @@ def get_user(username=None):
     return db.users.find()
 
 
+### KÄYTTÄJÄN TAVOITTEET ###
+
+def set_user_goals(uid, goals):
+    """
+    Asettaa id:tä vastaavan käyttäjän päivittäiset ravintoainetavoitteet.
+
+    Palauttaa päivityksen onnistumista vastaavan totuusarvon.
+    """
+    return db.users.update(
+        {"_id": objectify(uid)},
+        {"$set": {"goals": goals}}
+    )["err"] is None
+
+
 ### ELINTARVIKEHAKU ###
 
 def get_search(query):

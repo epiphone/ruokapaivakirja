@@ -48,7 +48,7 @@ def json(status="success", data=None, message=None):
     if status in ["success", "fail"]:
         return jsonify(dict(status=status, data=data))
 
-    return jsonify(dict(status="error", message=message))
+    return jsonify(dict(status="error", message=data))
 
 
 def escape(text):

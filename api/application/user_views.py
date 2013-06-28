@@ -45,3 +45,38 @@ def user():
     """
     user = g.user
     return json("success", {"username": user["username"], "key": user["key"]})
+
+
+@app.route("user/goals", methods=["GET", "POST"])
+@require_auth
+def goals():
+    """
+    Palauttaa/asettaa käyttäjän päivittäiset ravintoainetavoitteet.
+    Jos tavoitteita ei ole asetettu, palautetaan tyhjä olio.
+
+    POST-parametrit (kaikki pakollisia):
+    - kcal: päivittäinen energiatavoite kilokaloreina
+    - carbs: päivittäinen hiilihydraattitavoite grammoina
+    - fat: päivittäinen rasvatavoite grammoina
+    - protein: päivittäinen proteiinitavoite grammoina
+    """
+    user = g.user
+
+    if request.method == "GET":
+        if not "goals" in user:
+            return json("success", {})
+        return json("success", user.goals)
+
+    # POST
+    try:
+        for attr in ["kcal", "carbs", "fat", "protein"]:
+            request.form[attr] = int(request.form[attr])
+    except KeyError:
+        return json("fail", {"missing parameter": attr})
+    except ValueError:
+        return json("fail", {"invalid parameter": attr})
+
+    if db.set_user_goals(user["_id"], goals):
+        return json("success")
+    return json("error", "database update error")
+
