@@ -149,7 +149,7 @@ def days():
     except ValueError:
         return json("fail", {"parameters": "invalid date parameters"})
 
-    return db.get_days_by_user(g.user["_id"], start, end)
+    return json(data=db.get_days_by_user(g.user["_id"], start, end))
 
 
 ### BITES ###
