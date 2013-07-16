@@ -116,7 +116,7 @@ def delete_recipe(rid):
 
 ### KÄYTTÄJÄN ANNOKSET ###
 
-def get_bites_by_user(uid, start_date, end_date, date):
+def get_bites_by_user(uid, start_date=None, end_date=None, date=None):
     """
     Palauttaa käyttäjän annokset joko tietyltä päivältä tai aikaväliltä,
     järjestettynä päivämäärän (kasvava) mukaan.
