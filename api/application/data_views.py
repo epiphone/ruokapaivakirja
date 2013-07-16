@@ -125,6 +125,33 @@ def add_or_delete_recipe(rid):
     return json()
 
 
+### DAYS ###
+
+@app.route("/api/json/user/days")
+@require_auth
+def days():
+    """
+    Palauttaa käyttäjän päivät annetulta väliltä.
+
+    URL-parametrit:
+    - start: inklusiivinen alkupäivämäärä (YYYYmmdd)
+    - end: inklusiivinen loppupäivämäärä (YYYYmmdd)
+
+    Paluuarvo on muotoa [{date, count, kcal, carbs, fat, protein}]
+    """
+    start = request.args.get("start", None)
+    end = request.args.get("end", None)
+    try:
+        if start:
+            start = datetime.strptime(start, DATEFORMAT)
+        if end:
+            end = datetime.strptime(end, DATEFORMAT)
+    except ValueError:
+        return json("fail", {"parameters": "invalid date parameters"})
+
+    return db.get_days_by_user(g.user["_id"], start, end)
+
+
 ### BITES ###
 
 @app.route("/api/json/user/bites", methods=[GET, POST])
@@ -136,7 +163,6 @@ def bites():
     URL-parametrit:
     - start: inklusiivinen alkupäivämäärä (YYYYmmdd)
     - end: inklusiivinen loppupäivämäärä (YYYYmmdd)
-
 
     POST lisää uuden annoksen.
 
