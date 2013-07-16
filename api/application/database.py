@@ -250,7 +250,7 @@ def get_top_foods(limit=10):
     """
     Palauttaa listan suosituimmista elintarvikkeista.
     """
-    return db.users.aggregate([
+    tops = db.users.aggregate([
         {"$project": {"favs": 1}},
         {"$unwind": "$favs"},
         {"$group": {"_id": "$favs", "count": {"$sum": 1}}},
@@ -258,3 +258,7 @@ def get_top_foods(limit=10):
         {"$limit": limit},
         {"$project": {"fid": "$_id.fid", "name": "$_id.name", "count": 1}}
     ])
+
+    if "result" in tops:
+        return tops["result"]
+    return []

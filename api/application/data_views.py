@@ -58,6 +58,17 @@ def search_foods():
     return json(data=results)
 
 
+### TOP FOODS ###
+
+@app.route("/api/json/topfoods")
+def top_foods():
+    """
+    Palauttaa listassa 10 suosituinta elintarviketta.
+    """
+    top_foods = db.get_top_foods(10)
+    return json(data=top_foods)
+
+
 ### FAVS ###
 
 @app.route("/api/json/user/favs")
