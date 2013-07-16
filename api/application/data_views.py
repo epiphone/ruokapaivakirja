@@ -154,6 +154,23 @@ def days():
 
 ### BITES ###
 
+@app.route("/api/json/yser/bites/<date>")
+@require_auth
+def bites_by_date(date):
+    """
+    Palauttaa kirjautuneen käyttäjän annokset valitulta päivältä.
+
+    Parametrit:
+    - date: päivämäärä muodossa YYYYmmdd
+    """
+    try:
+        date = datetime.strptime(date, DATEFORMAT)
+    except ValueError:
+        return json("fail", {"parameters": "invalid date parameter"})
+
+    return json(data=db.get_bites_by_user(g.user["_id"], date=date))
+
+
 @app.route("/api/json/user/bites", methods=[GET, POST])
 @require_auth
 def bites():

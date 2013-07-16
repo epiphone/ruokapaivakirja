@@ -116,19 +116,25 @@ def delete_recipe(rid):
 
 ### KÄYTTÄJÄN ANNOKSET ###
 
-def get_bites_by_user(uid, start_date, end_date):
+def get_bites_by_user(uid, start_date, end_date, date):
     """
-    Palauttaa käyttäjän annokset annetulta aikaväliltä, järjestettynä
-    päivämäärän (kasvava) mukaan.
+    Palauttaa käyttäjän annokset joko tietyltä päivältä tai aikaväliltä,
+    järjestettynä päivämäärän (kasvava) mukaan.
 
     Päivämääräparametrit ovat inklusiivisia.
     """
-    bites = db.bites.find({
-        "uid": objectify(uid),
-        "date": {"$gte": start_date, "$lte": end_date}
-    }).sort("date")
+    if date:
+        bites = db.bites.find({
+            "uid": objectify(uid),
+            "date": date
+        })
+    else:
+        bites = db.bites.find({
+            "uid": objectify(uid),
+            "date": {"$gte": start_date, "$lte": end_date}
+        })
 
-    return list(bites) if bites else bites
+    return list(bites.sort("date")) if bites else bites
 
 
 def add_bite(bite):
