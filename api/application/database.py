@@ -146,6 +146,29 @@ def delete_bite(bid):
     return db.bites.remove({"_id": bid})["n"]
 
 
+def get_days_by_user(uid, start_date=None, end_date=None):
+    """
+    Palauttaa listan päivistä, joina käyttäjä on lisännyt annoksia.
+    Päivällä on seuraavat avaimet: count, carbs, fat, protein, kcal, date
+
+    Päiväparametrit ovat inklusiivisia.
+    """
+    key = ["date"]
+    condition = {"uid": objectify(uid)}
+    date_condition = {}
+    if start_date:
+        date_condition["$gte"] = start_date
+    if end_date:
+        date_condition["$lte"] = end_date
+    if date_condition:
+        condition["date"] = date_condition
+
+    initial = {key: 0 for key in ["count", "carbs", "fat", "protein", "kcal"]}
+    reducer = "function(c,r){r.count++;r.carbs+=c.carbs;r.fat+=c.fat;r.kcal+=c.kcal;r.protein+=c.protein;}"
+
+    return db.bites.group(key, condition, initial, reducer)
+
+
 ### KÄYTTÄJÄN SUOSIKIT ###
 
 def get_favs_by_user(uid):
