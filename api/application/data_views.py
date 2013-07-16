@@ -154,7 +154,7 @@ def days():
 
 ### BITES ###
 
-@app.route("/api/json/yser/bites/<date>")
+@app.route("/api/json/user/bites/<date>")
 @require_auth
 def bites_by_date(date):
     """
