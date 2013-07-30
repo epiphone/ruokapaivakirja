@@ -1,6 +1,4 @@
-ruokapaivakirja
-===============
+ruokapaivakirja REST API
+========================
 
 Sovellus ruokavalion tarkkailua varten.
-
-JSON API + Windows 8 client
