@@ -1,4 +1,8 @@
-ruokapaivakirja REST API
+Ruokapäiväkirja REST API
 ========================
 
-Sovellus ruokavalion tarkkailua varten.
+Aleksi Pekkala
+
+Python + Flask + MongoDB
+
+Client app can be found [here](https://github.com/epiphone/ruokapaivakirja_webclient)
